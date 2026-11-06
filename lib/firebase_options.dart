@@ -41,48 +41,44 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAkWVTVtgXsu3nf_auH2iTgbeCXkcRX4gA',
-    appId: '1:48652831733:web:c63cb0d9af504e4ff92ebc',
-    messagingSenderId: '48652831733',
-    projectId: 'feedback-review-app-581ac',
-    authDomain: 'feedback-review-app-581ac.firebaseapp.com',
-    storageBucket: 'feedback-review-app-581ac.firebasestorage.app',
-    measurementId: 'G-0KKWT54BT4',
+    apiKey: 'AIzaSyCw5E7125kGJGULoBaQP82I9jww1oUnp6o',
+    appId: '1:231440125138:web:c6a29d176cd93e8a71b10b',
+    messagingSenderId: '231440125138',
+    projectId: 'sohaib-feedback-review-app',
+    authDomain: 'sohaib-feedback-review-app.firebaseapp.com',
+    storageBucket: 'sohaib-feedback-review-app.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBSAJJNv2QHy-DA9fX8n_4WAqpfls685oM',
-    appId: '1:48652831733:android:954ff293bce004e6f92ebc',
-    messagingSenderId: '48652831733',
-    projectId: 'feedback-review-app-581ac',
-    storageBucket: 'feedback-review-app-581ac.firebasestorage.app',
+    apiKey: 'AIzaSyBOKknGCa56NLgiPizTa-8ADaATnnSmcnk',
+    appId: '1:231440125138:android:949f7676b52faa9571b10b',
+    messagingSenderId: '231440125138',
+    projectId: 'sohaib-feedback-review-app',
+    storageBucket: 'sohaib-feedback-review-app.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBY9wC_wMi4b59Bnn4isXXG2YSjqLmy58M',
-    appId: '1:48652831733:ios:360ed3196c939047f92ebc',
-    messagingSenderId: '48652831733',
-    projectId: 'feedback-review-app-581ac',
-    storageBucket: 'feedback-review-app-581ac.firebasestorage.app',
+    apiKey: 'AIzaSyDYt_EBxoD64oWJjwXbTX84NfAj0E57zrY',
+    appId: '1:231440125138:ios:4824fc28e886da0971b10b',
+    messagingSenderId: '231440125138',
+    projectId: 'sohaib-feedback-review-app',
+    storageBucket: 'sohaib-feedback-review-app.firebasestorage.app',
     iosBundleId: 'com.example.feedbackReviewApp',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBY9wC_wMi4b59Bnn4isXXG2YSjqLmy58M',
-    appId: '1:48652831733:ios:360ed3196c939047f92ebc',
-    messagingSenderId: '48652831733',
-    projectId: 'feedback-review-app-581ac',
-    storageBucket: 'feedback-review-app-581ac.firebasestorage.app',
+    apiKey: 'AIzaSyDYt_EBxoD64oWJjwXbTX84NfAj0E57zrY',
+    appId: '1:231440125138:ios:4824fc28e886da0971b10b',
+    messagingSenderId: '231440125138',
+    projectId: 'sohaib-feedback-review-app',
+    storageBucket: 'sohaib-feedback-review-app.firebasestorage.app',
     iosBundleId: 'com.example.feedbackReviewApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAkWVTVtgXsu3nf_auH2iTgbeCXkcRX4gA',
-    appId: '1:48652831733:web:6f9d5ba8a151ddf0f92ebc',
-    messagingSenderId: '48652831733',
-    projectId: 'feedback-review-app-581ac',
-    authDomain: 'feedback-review-app-581ac.firebaseapp.com',
-    storageBucket: 'feedback-review-app-581ac.firebasestorage.app',
-    measurementId: 'G-GLQ465BJVM',
+    apiKey: 'AIzaSyCw5E7125kGJGULoBaQP82I9jww1oUnp6o',
+    appId: '1:231440125138:web:1a414fa01c81d42d71b10b',
+    messagingSenderId: '231440125138',
+    projectId: 'sohaib-feedback-review-app',
+    authDomain: 'sohaib-feedback-review-app.firebaseapp.com',
+    storageBucket: 'sohaib-feedback-review-app.firebasestorage.app',
   );
 }

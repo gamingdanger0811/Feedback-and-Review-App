@@ -17,17 +17,17 @@ class AuthService {
     required String name,
     required String email,
     required String password,
-    required String role,
   }) async {
     try {
-      await _createUser(
-        name: name,
-        email: email,
-        password: password,
-        role: role,
-      );
+      await _createUser(name: name, email: email, password: password);
       return null;
     } on FirebaseAuthException catch (error) {
+      if (error.code == 'email-already-in-use') {
+        return 'An account already uses this email. Use Forgot Password? to recover it.';
+      }
+      if (error.code == 'weak-password') {
+        return 'Choose a stronger password with at least 6 characters.';
+      }
       return error.message ?? 'Signup failed';
     } on FirebaseException catch (error) {
       return error.message ?? 'Could not save your account profile';
@@ -39,19 +39,13 @@ class AuthService {
     required String email,
     required String password,
   }) {
-    return _createUser(
-      name: name,
-      email: email,
-      password: password,
-      role: 'user',
-    );
+    return _createUser(name: name, email: email, password: password);
   }
 
   Future<UserCredential> _createUser({
     required String name,
     required String email,
     required String password,
-    required String role,
   }) async {
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email.trim(),
@@ -63,10 +57,15 @@ class AuthService {
       throw StateError('Firebase Auth did not return a user after signup.');
     }
 
+    final trimmedName = name.trim();
+    if (trimmedName.isNotEmpty) {
+      await user.updateProfile(displayName: trimmedName);
+    }
+
     await _firestore.collection('users').doc(user.uid).set({
-      'name': name.trim(),
+      'name': trimmedName,
       'email': email.trim(),
-      'role': role,
+      'role': 'user',
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -81,7 +80,18 @@ class AuthService {
       await signInWithEmailAndPassword(email: email, password: password);
       return null;
     } on FirebaseAuthException catch (error) {
-      return error.message ?? 'Login failed';
+      return switch (error.code) {
+        'invalid-credential' || 'wrong-password' || 'user-not-found' =>
+          'Email or password is incorrect. Use Forgot Password? to reset it, '
+              'or Sign Up if you have not created an account.',
+        'invalid-email' => 'Enter a valid email address.',
+        'user-disabled' =>
+          'This account is disabled. Contact an administrator.',
+        'too-many-requests' =>
+          'Too many sign-in attempts. Wait a little and try again.',
+        'network-request-failed' => 'Could not connect to Firebase. Check your internet connection and try again.',
+        _ => error.message ?? 'Login failed',
+      };
     }
   }
 
@@ -106,7 +116,8 @@ class AuthService {
 
   Future<String?> getUserRole(String uid) async {
     final document = await _firestore.collection('users').doc(uid).get();
-    return document.data()?['role'] as String?;
+    final role = document.data()?['role'];
+    return role is String ? role.trim().toLowerCase() : null;
   }
 
   Future<String?> getUserName(String uid) async {

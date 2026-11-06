@@ -11,6 +11,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:feedback_review_app/main.dart';
 import 'package:feedback_review_app/models/feedback_model.dart';
 import 'package:feedback_review_app/screens/feedback_detail_sheet.dart';
+import 'package:feedback_review_app/screens/auth/login_screen.dart';
+import 'package:feedback_review_app/screens/auth/signup_screen.dart';
 import 'package:feedback_review_app/screens/submit_feedback_sheet.dart';
 import 'package:feedback_review_app/screens/user/feedback_form_screen.dart';
 import 'package:feedback_review_app/widgets/feedback_card.dart';
@@ -39,6 +41,29 @@ void main() {
     expect(find.text("Don't have an account? Sign Up"), findsOneWidget);
   });
 
+  testWidgets('login screen provides an admin login mode', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: LoginScreen()));
+
+    await tester.tap(find.byKey(const Key('login-role-toggle')));
+    await tester.pump();
+
+    expect(find.text('Administrator access'), findsOneWidget);
+    expect(find.text('Admin Log In'), findsOneWidget);
+    expect(find.text('User Login'), findsOneWidget);
+  });
+
+  testWidgets('public signup does not allow assigning the admin role', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: SignupScreen()));
+
+    expect(find.text('Role'), findsNothing);
+    expect(find.text('Admin'), findsNothing);
+    expect(find.text('User / Intern'), findsNothing);
+  });
+
   testWidgets('star rating reports the selected value', (
     WidgetTester tester,
   ) async {
@@ -64,6 +89,22 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const MaterialApp(home: FeedbackFormScreen()));
+
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Feedback'));
+    await tester.pump();
+
+    expect(
+      find.text('Task/Course name aur rating dono zaroori hain'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('submit feedback sheet requires a name and rating', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SubmitFeedbackSheet())),
+    );
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Feedback'));
     await tester.pump();

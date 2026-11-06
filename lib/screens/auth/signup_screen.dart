@@ -16,7 +16,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   late final AuthService _authService = AuthService();
 
-  String _selectedRole = 'user';
   bool _isLoading = false;
 
   @override
@@ -64,7 +63,6 @@ class _SignupScreenState extends State<SignupScreen> {
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
-      role: _selectedRole,
     );
 
     setState(() => _isLoading = false);
@@ -128,19 +126,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: _boxDecoration('Password'),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedRole,
-                  decoration: _boxDecoration('Role'),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'user',
-                      child: Text('User / Intern'),
-                    ),
-                    DropdownMenuItem(value: 'admin', child: Text('Admin')),
-                  ],
-                  onChanged: (value) => setState(() => _selectedRole = value!),
                 ),
                 const SizedBox(height: 24),
                 SizedBox(

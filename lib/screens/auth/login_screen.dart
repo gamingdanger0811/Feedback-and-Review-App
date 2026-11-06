@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
@@ -17,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   late final AuthService _authService = AuthService();
   bool _isLoading = false;
+  bool _isAdminLogin = false;
 
   @override
   void dispose() {
@@ -37,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     String? error;
     String? role;
+    String? uid;
     try {
       error = await _authService.login(
         email: _emailController.text.trim(),
@@ -44,16 +47,49 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (error == null) {
-        final uid = _authService.currentUser?.uid;
+        uid = _authService.currentUser?.uid;
         if (uid == null) {
           await _authService.logout();
           error = 'Unable to load your account. Please try again.';
         } else {
           role = await _authService.getUserRole(uid);
+          if (role == null) {
+            await _authService.logout();
+            error = _isAdminLogin
+                ? 'This account has no Firebase role profile. In Firebase '
+                      'Console, add users/$uid with a string field role: "admin".'
+                : 'This account has no Firebase user profile. Try signing up '
+                      'again or contact the project administrator.';
+          } else if (_isAdminLogin && role != 'admin') {
+            await _authService.logout();
+            error =
+                'Firebase profile users/$uid has role "$role". Change '
+                'that document role to "admin" in Firebase Console.';
+          } else if (!_isAdminLogin && role == 'admin') {
+            await _authService.logout();
+            error = 'Choose Admin Login to sign in with this account.';
+          }
         }
       }
+    } on FirebaseException catch (exception) {
+      uid ??= _authService.currentUser?.uid;
+      await _authService.logout();
+      error = switch (exception.code) {
+        'permission-denied' =>
+          'Firebase denied access to users/${uid ?? 'your account'}. '
+              'Allow signed-in users to read their own profile in Firestore rules.',
+        'unavailable' =>
+          'Firestore is unavailable. Check your connection and try again.',
+        _ =>
+          'Could not load your Firebase profile (${exception.code}). '
+              'Check the users document and Firestore rules.',
+      };
     } catch (_) {
-      error = 'Unable to load your account. Please try again.';
+      uid ??= _authService.currentUser?.uid;
+      await _authService.logout();
+      error =
+          'Could not verify Firebase profile for '
+          '${uid ?? 'this account'}. Check its users document and role field.';
     }
 
     if (!mounted) return;
@@ -125,6 +161,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _isAdminLogin ? 'Administrator access' : 'User access',
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 14,
+                      ),
+                    ),
                     const SizedBox(height: 28),
                     TextField(
                       key: const Key('login-email'),
@@ -172,14 +216,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               onPressed: _handleLogin,
-                              child: const Text(
-                                'Log In',
-                                style: TextStyle(
+                              child: Text(
+                                _isAdminLogin ? 'Admin Log In' : 'Log In',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      key: const Key('login-role-toggle'),
+                      onPressed: _isLoading
+                          ? null
+                          : () =>
+                                setState(() => _isAdminLogin = !_isAdminLogin),
+                      child: Text(_isAdminLogin ? 'User Login' : 'Admin Login'),
                     ),
                     const SizedBox(height: 16),
                     TextButton(

@@ -20,6 +20,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       .getAllFeedback();
 
   String _filterCategory = 'All';
+  bool _isAddingSampleFeedback = false;
 
   Future<void> _handleLogout() async {
     try {
@@ -31,6 +32,60 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Logout failed: $error')));
+    }
+  }
+
+  Future<void> _addSampleFeedback() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add sample feedback?'),
+        content: const Text(
+          'This adds 15 clearly labeled demo entries with mixed ratings '
+          'to the feedback dashboard. Existing entries are left unchanged.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Add samples'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final user = _auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to add sample feedback.')),
+      );
+      return;
+    }
+
+    setState(() => _isAddingSampleFeedback = true);
+    try {
+      final addedCount = await _firestoreService.addSampleFeedback(user.uid);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            addedCount == 0
+                ? 'Sample feedback has already been added.'
+                : 'Added $addedCount sample feedback entries.',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not add sample feedback: $error')),
+      );
+    } finally {
+      if (mounted) setState(() => _isAddingSampleFeedback = false);
     }
   }
 
@@ -76,6 +131,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               onChanged: (value) {
                 if (value != null) setState(() => _filterCategory = value);
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            child: OutlinedButton.icon(
+              onPressed: _isAddingSampleFeedback ? null : _addSampleFeedback,
+              icon: _isAddingSampleFeedback
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.science_outlined),
+              label: Text(
+                _isAddingSampleFeedback
+                    ? 'Adding sample feedback...'
+                    : 'Add 15 sample feedback entries',
+              ),
             ),
           ),
           Expanded(

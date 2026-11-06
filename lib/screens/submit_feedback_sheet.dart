@@ -55,7 +55,9 @@ class _SubmitFeedbackSheetState extends State<SubmitFeedbackSheet> {
     if (_isSubmitting) return;
     if (_topicController.text.trim().isEmpty || _rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Topic aur rating dono zaroori hain')),
+        const SnackBar(
+          content: Text('Task/Course name aur rating dono zaroori hain'),
+        ),
       );
       return;
     }
